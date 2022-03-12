@@ -1,10 +1,22 @@
 type AfroApeToken @entity {
   id: ID!
   tokenId: BigInt!
-  owner: Owner!
+  tokenURI: Bytes!
+  metadataURI: Bytes
+  owner: Account!
 }
 
-type Owner @entity {
-  address: Bytes!
-  approved: Bytes! # address
+# @dev This entity stores everyone that owned or owns an AfroApe 
+type Account @entity {
+  id: ID!
+  afroApeTokens: [AfroApeToken!]! @derivedFrom(field: "owner")
+  tokensSent: [Transfer!]! @derivedFrom(field: "from")
+  tokensReceived: [Transfer!]! @derivedFrom(field: "to")
+}
+
+type Transfer @entity {
+  id: ID!
+  from: Account!
+  to: Account!
+  afroApeToken: AfroApeToken!
 }

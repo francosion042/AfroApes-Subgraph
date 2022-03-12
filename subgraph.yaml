@@ -13,10 +13,8 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - ApprovalForAll
-        - OGMinted
-        - OwnershipTransferred
+        - AfroApeToken
+        - Owner
         - Transfer
       abis:
         - name: AfroApes
@@ -28,8 +26,6 @@ dataSources:
           handler: handleApprovalForAll
         - event: OGMinted(indexed address,uint256,uint256)
           handler: handleOGMinted
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
       file: ./src/mapping.ts

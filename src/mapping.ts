@@ -24,7 +24,7 @@ export function handleApproval(event: Approval): void {
   }
 
   // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
+  // entity.count = entity.count + BigInt.fromI32(1)
 
   // Entity fields can be set based on event parameters
   entity.owner = event.params.owner
@@ -68,10 +68,8 @@ export function handleApproval(event: Approval): void {
   // - contract.verifyAddressIsWhiteListed(...)
 }
 
-export function handleApprovalForAll(event: ApprovalForAll): void {}
 
 export function handleOGMinted(event: OGMinted): void {}
 
-export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
 
 export function handleTransfer(event: Transfer): void {}
