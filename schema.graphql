@@ -1,6 +1,10 @@
-type ExampleEntity @entity {
+type AfroApeToken @entity {
   id: ID!
-  count: BigInt!
-  owner: Bytes! # address
+  tokenId: BigInt!
+  owner: Owner!
+}
+
+type Owner @entity {
+  address: Bytes!
   approved: Bytes! # address
 }
