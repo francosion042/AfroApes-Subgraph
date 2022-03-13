@@ -1,12 +1,13 @@
+
 type AfroApeToken @entity {
   id: ID!
   tokenId: BigInt!
-  tokenURI: Bytes!
-  metadataURI: Bytes
+  tokenURI: String!
   owner: Account!
+  transfers: [Transfer!]! @derivedFrom(field: "afroApeToken")
 }
 
-# @dev This entity stores everyone that owned or owns an AfroApe 
+# @dev This entity stores everyone that owned or owns an AfroApe
 type Account @entity {
   id: ID!
   afroApeTokens: [AfroApeToken!]! @derivedFrom(field: "owner")
@@ -19,4 +20,6 @@ type Transfer @entity {
   from: Account!
   to: Account!
   afroApeToken: AfroApeToken!
+  transactionHash: Bytes!
+  transactionTime: BigInt!
 }

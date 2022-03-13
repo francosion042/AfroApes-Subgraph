@@ -1,75 +1,66 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+// import { BigInt } from "@graphprotocol/graph-ts"
 import {
-  AfroApes,
-  Approval,
-  ApprovalForAll,
-  OGMinted,
-  OwnershipTransferred,
-  Transfer
+  AfroApes as AfroApesContract,
+  Transfer as TransferEvent
 } from "../generated/AfroApes/AfroApes"
-import { ExampleEntity } from "../generated/schema"
 
-export function handleApproval(event: Approval): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
+import { Transfer, Account, AfroApeToken } from "../generated/schema"
 
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (!entity) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
-
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
+export function handleTransfer(event: TransferEvent): void {
+  /**
+   * @dev load the account that is being transfered From, create a new record if it doesn't exist
+   * @param  ID a string value for the entity Id
+   */ 
+  let transferFrom  = Account.load(event.params.from.toHexString())
+  if (!transferFrom) {
+    transferFrom = new Account(event.params.to.toHexString())
+    transferFrom.save()
   }
 
-  // BigInt and BigDecimal math are supported
-  // entity.count = entity.count + BigInt.fromI32(1)
+  /**
+   * @dev load the account that is being transfered To, create a new record if it doesn't exist
+   * @param  ID a string value for the entity Id
+   */
+  let transferTo  = Account.load(event.params.to.toHexString())
+  if (!transferTo) {
+    transferTo = new Account(event.params.to.toHexString())
+    transferTo.save()
+  }
+  /**
+   * @dev look for the token, if it doesn't exist, create a new record
+   * @param  ID a string value for the entity Id
+   */
+  let afroApeToken = AfroApeToken.load(event.params.tokenId.toHexString())
 
-  // Entity fields can be set based on event parameters
-  entity.owner = event.params.owner
-  entity.approved = event.params.approved
+  if (!afroApeToken) {
+    /**
+     * @dev call the AfroApes Contract Class
+     * @param address the contract address taken from the event
+     */
+    let afroApesContract = AfroApesContract.bind(event.address)
 
-  // Entities can be written to the store with `.save()`
-  entity.save()
+    afroApeToken = new AfroApeToken(event.params.tokenId.toHexString())
+    afroApeToken.tokenId = event.params.tokenId
+    afroApeToken.tokenURI = afroApesContract.tokenURI(event.params.tokenId)
+    afroApeToken.owner = event.params.to.toHexString()
 
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
+    afroApeToken.save()
+  }
 
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
-  // - contract.MAX_APES(...)
-  // - contract.MAX_OG_PURCHASE(...)
-  // - contract.OG_MAX(...)
-  // - contract.balanceOf(...)
-  // - contract.baseURI(...)
-  // - contract.getApproved(...)
-  // - contract.getMintPriceInWEI(...)
-  // - contract.isApprovedForAll(...)
-  // - contract.name(...)
-  // - contract.owner(...)
-  // - contract.ownerOf(...)
-  // - contract.saleIsActive(...)
-  // - contract.supportsInterface(...)
-  // - contract.symbol(...)
-  // - contract.tokenURI(...)
-  // - contract.totalOGsMinted(...)
-  // - contract.totalSupply(...)
-  // - contract.verifyAddressIsWhiteListed(...)
+  /**
+   * @dev Create a new Transfer Record
+   * @param  ID a string value for the entity Id, derived from the transaction hash
+   */
+  let transfer = new Transfer(event.transaction.hash.toHexString())
+  transfer.from = event.params.from.toHexString()
+  transfer.to = event.params.to.toHexString()
+  transfer.transactionHash = event.transaction.hash
+  transfer.transactionTime = event.block.timestamp
+
+  transfer.save()
 }
 
 
-export function handleOGMinted(event: OGMinted): void {}
 
+// export function handleOGMinted(event: OGMinted): void {}
 
-export function handleTransfer(event: Transfer): void {}

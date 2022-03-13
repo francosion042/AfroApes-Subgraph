@@ -1,4 +1,4 @@
-specVersion: 0.0.1
+specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
@@ -14,18 +14,12 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - AfroApeToken
-        - Owner
+        - Account
         - Transfer
       abis:
         - name: AfroApes
           file: ./abis/AfroApes.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,indexed uint256)
-          handler: handleApproval
-        - event: ApprovalForAll(indexed address,indexed address,bool)
-          handler: handleApprovalForAll
-        - event: OGMinted(indexed address,uint256,uint256)
-          handler: handleOGMinted
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
       file: ./src/mapping.ts
